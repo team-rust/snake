@@ -1,0 +1,11 @@
+[package]
+name = "snake"
+version = "0.1.0"
+authors = ["matthias"]
+
+[dependencies]
+piston = "*"
+piston_window = "*"
+piston2d-graphics = "*"
+pistoncore-glutin_window = "*"
+piston2d-opengl_graphics = "*"
