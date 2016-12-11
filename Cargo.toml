@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["matthias"]
 
 [dependencies]
+rand = "*"
 piston = "*"
 piston_window = "*"
 piston2d-graphics = "*"
