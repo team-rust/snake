@@ -2,6 +2,31 @@ extern crate piston_window;
 
 use piston_window::*;
 
+
+struct Snake {
+    x: f64,
+    y: f64,
+    size: f64,
+    speed_x: f64,
+    speed_y: f64,
+}
+
+impl Snake {
+     fn new(x: f64, y: f64) -> Snake {
+        Snake {x: x, y: y, size: 10.0, speed_x: 0.5, speed_y: 0.0}
+     }
+
+     fn up() {
+
+     }
+}
+
+
+
+
+
+
+
 fn main() {
 
     const WIDTH : f64 = 640.0;
@@ -18,6 +43,35 @@ fn main() {
     let mut speed_y = 0.5;
 
     while let Some(e) = window.next() {
+
+        match e {
+           Event::Input(ref inp) => match *inp {
+            Input::Press(but) => {
+                match but {
+                    Button::Keyboard(Key::Up) => {
+                        speed_x = 0.0;
+                        speed_y = -0.5;
+                    }
+                    Button::Keyboard(Key::Down) => {
+                        speed_x = 0.0;
+                        speed_y = 0.5;
+                    }
+                    Button::Keyboard(Key::Left) => {
+                        speed_x = -0.5;
+                        speed_y = 0.0;
+                    }
+                    Button::Keyboard(Key::Right) => {
+                        speed_x = 0.5;
+                        speed_y = 0.0;
+                    }
+                    _ => {}
+                }
+             },
+           _ => {}
+           },
+           _ => {}
+        }
+
         x += speed_x;
         y += speed_y;
 
