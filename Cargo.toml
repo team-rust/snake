@@ -8,4 +8,6 @@ piston = "*"
 piston_window = "*"
 piston2d-graphics = "*"
 pistoncore-glutin_window = "*"
-piston2d-opengl_graphics = "*"
+#piston2d-opengl_graphics = "*"
+piston2d-gfx_graphics = "*"
+

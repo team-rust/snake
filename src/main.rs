@@ -1,7 +1,8 @@
 extern crate piston_window;
+extern crate gfx_graphics;
 
 use piston_window::*;
-
+use gfx_graphics::GfxGraphics;
 
 struct Snake {
     x: f64,
@@ -16,16 +17,37 @@ impl Snake {
         Snake {x: x, y: y, size: 10.0, speed_x: 0.5, speed_y: 0.0}
      }
 
-     fn up() {
+     fn up(&mut self) {
+        self.speed_x = 0.0;
+        self.speed_y = -0.5;
+     }
 
+     fn down(&mut self) {
+        self.speed_x = 0.0;
+        self.speed_y = 0.5;
+     }
+
+     fn left(&mut self) {
+        self.speed_x = -0.5;
+        self.speed_y = 0.0;
+     }
+
+     fn right(&mut self) {
+        self.speed_x = 0.5;
+        self.speed_y = 0.0;
+     }
+
+     fn movement(&mut self) {
+        self.x += self.speed_x;
+        self.y += self.speed_y;
+     }
+
+     fn draw(&self, c: piston_window::Context, g: &mut G2d) {
+        rectangle([1.0, 1.0, 1.0, 1.0],
+                    [self.x, self.y, self.size, self.size],
+                    c.transform, g);
      }
 }
-
-
-
-
-
-
 
 fn main() {
 
@@ -36,11 +58,7 @@ fn main() {
         WindowSettings::new("Snake", [WIDTH as u32, HEIGHT as u32])
         .exit_on_esc(true).build().unwrap();
 
-    let size = 10.0;
-    let mut x = 0.0;
-    let mut y = 0.0;
-    let mut speed_x = 0.5;
-    let mut speed_y = 0.5;
+    let mut snake = Snake::new(0.0, 0.0);
 
     while let Some(e) = window.next() {
 
@@ -49,20 +67,16 @@ fn main() {
             Input::Press(but) => {
                 match but {
                     Button::Keyboard(Key::Up) => {
-                        speed_x = 0.0;
-                        speed_y = -0.5;
+                        snake.up()
                     }
                     Button::Keyboard(Key::Down) => {
-                        speed_x = 0.0;
-                        speed_y = 0.5;
+                        snake.down()
                     }
                     Button::Keyboard(Key::Left) => {
-                        speed_x = -0.5;
-                        speed_y = 0.0;
+                        snake.left()
                     }
                     Button::Keyboard(Key::Right) => {
-                        speed_x = 0.5;
-                        speed_y = 0.0;
+                        snake.right()
                     }
                     _ => {}
                 }
@@ -72,21 +86,20 @@ fn main() {
            _ => {}
         }
 
-        x += speed_x;
-        y += speed_y;
+        snake.movement();
 
+        /*
         if x + size >= WIDTH || x < 0.0 {
             speed_x *= -1.0;
         }
         if y + size > HEIGHT || y < 0.0 {
             speed_y *= -1.0;
         }
+        */
 
         window.draw_2d(&e, |c, g| {
             clear([0.0; 4], g); // black
-            rectangle([1.0, 1.0, 1.0, 1.0], // white
-                      [x, y, size, size],
-                      c.transform, g);
+            snake.draw(c, g)
         });
     }
 }
