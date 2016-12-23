@@ -4,6 +4,68 @@ extern crate piston_window;
 use piston_window::*;
 use rand::Rng;
 
+struct Game {
+    window: PistonWindow,
+    snake: Snake,
+    fruit: Fruit,
+}
+
+impl Game {
+    fn new(window: PistonWindow ) -> Game {
+        let mut snake = Snake::new(0.0, 0.0);
+        let mut fruit = Fruit::new();
+        Game { window: window, snake: snake, fruit: fruit}
+    }
+
+    fn handle_event(&mut self, e: &Event) {
+        match *e {
+            Event::Input(ref inp) =>
+                match *inp {
+                    Input::Press(but) => {
+                        match but {
+                            Button::Keyboard(Key::Up) => {
+                                self.snake.up()
+                            }
+                            Button::Keyboard(Key::Down) => {
+                                self.snake.down()
+                            }
+                            Button::Keyboard(Key::Left) => {
+                                self.snake.left()
+                            }
+                            Button::Keyboard(Key::Right) => {
+                                self.snake.right()
+                            }
+                            _ => {}
+                        }
+                    },
+                    _ => {}
+                },
+                _ => {}
+            }
+    }
+
+    fn run(&mut self) {
+        while let Some(e) = self.window.next() {
+            self.handle_event(&e);
+            self.snake.movement();
+        
+            let (sx, sy) = self.snake.pos();
+            let (fx, fy) = self.fruit.pos();
+            if sx - fx < 10.0 && sy - fy < 10.0 {
+                self.fruit = Fruit::new();
+            }
+    
+            self.window.draw_2d(&e, |c, g| {
+                clear([0.0; 4], g); // black
+                {
+                    self.snake.draw(c, g);
+                    self.fruit.draw(c, g);
+                }
+            });
+        }
+    }
+}
+
 struct Fruit {
     x: f64,
     y: f64,
@@ -74,7 +136,7 @@ impl Snake {
          (self.x, self.y)
      }
 
-     fn draw(&self, c: piston_window::Context, g: &mut G2d) {
+     fn draw(&mut self, c: piston_window::Context, g: &mut G2d) {
         rectangle(self.color,
                   [self.x, self.y, self.size, self.size],
                   c.transform, g);
@@ -90,47 +152,6 @@ fn main() {
         WindowSettings::new("Snake", [WIDTH as u32, HEIGHT as u32])
         .exit_on_esc(true).build().unwrap();
 
-    let mut snake = Snake::new(0.0, 0.0);
-    let mut fruit = Fruit::new();
-
-    while let Some(e) = window.next() {
-
-        match e {
-           Event::Input(ref inp) => match *inp {
-            Input::Press(but) => {
-                match but {
-                    Button::Keyboard(Key::Up) => {
-                        snake.up()
-                    }
-                    Button::Keyboard(Key::Down) => {
-                        snake.down()
-                    }
-                    Button::Keyboard(Key::Left) => {
-                        snake.left()
-                    }
-                    Button::Keyboard(Key::Right) => {
-                        snake.right()
-                    }
-                    _ => {}
-                }
-             },
-           _ => {}
-           },
-           _ => {}
-        }
-
-        snake.movement();
-
-        let (sx, sy) = snake.pos();
-        let (fx, fy) = fruit.pos();
-        if sx - fx < 10.0 && sy - fy < 10.0 {
-            fruit = Fruit::new();
-        }
-
-        window.draw_2d(&e, |c, g| {
-            clear([0.0; 4], g); // black
-            snake.draw(c, g);
-            fruit.draw(c, g);
-        });
-    }
+    let mut game = Game::new(window);
+    game.run();
 }
