@@ -4,6 +4,10 @@ extern crate piston_window;
 use piston_window::*;
 use rand::Rng;
 
+const WIDTH: f64 = 640.0;
+const HEIGHT: f64 = 480.0;
+const TILE_SIZE: f64 = 10.0;
+
 struct Game {
     window: PistonWindow,
     snake: Snake,
@@ -44,7 +48,7 @@ impl Game {
     fn run(&mut self) {
         while let Some(e) = self.window.next() {
             self.handle_event(&e);
-            self.snake.movement();
+            self.snake.mv();
 
             let (sx, sy) = self.snake.pos();
             let (fx, fy) = self.fruit.pos();
@@ -86,7 +90,7 @@ impl Fruit {
 
     fn draw(&self, c: piston_window::Context, g: &mut G2d) {
         rectangle(self.color,
-                  [self.x, self.y, self.size, self.size],
+                  rectangle::square(self.x, self.y, self.size),
                   c.transform,
                   g);
     }
@@ -137,7 +141,7 @@ impl Snake {
         self.speed_y = 0.0;
     }
 
-    fn movement(&mut self) {
+    fn mv(&mut self) {
         self.x += self.speed_x;
         self.y += self.speed_y;
     }
@@ -148,7 +152,7 @@ impl Snake {
 
     fn draw(&mut self, c: piston_window::Context, g: &mut G2d) {
         rectangle(self.color,
-                  [self.x, self.y, self.size, self.size],
+                  rectangle::square(self.x, self.y, self.size),
                   c.transform,
                   g);
     }
@@ -156,8 +160,6 @@ impl Snake {
 
 fn main() {
 
-    const WIDTH: f64 = 640.0;
-    const HEIGHT: f64 = 480.0;
 
     let window: PistonWindow = WindowSettings::new("Snake", [WIDTH as u32, HEIGHT as u32])
         .exit_on_esc(true)
