@@ -31,10 +31,10 @@ impl Game {
                 match *inp {
                     Input::Press(but) => {
                         match but {
-                            Button::Keyboard(Key::Up) => self.snake.up(),
-                            Button::Keyboard(Key::Down) => self.snake.down(),
-                            Button::Keyboard(Key::Left) => self.snake.left(),
-                            Button::Keyboard(Key::Right) => self.snake.right(),
+                            Button::Keyboard(Key::Up) => self.snake.dir(Direction::Up),
+                            Button::Keyboard(Key::Down) => self.snake.dir(Direction::Down),
+                            Button::Keyboard(Key::Left) => self.snake.dir(Direction::Left),
+                            Button::Keyboard(Key::Right) => self.snake.dir(Direction::Right),
                             _ => {}
                         }
                     }
@@ -52,7 +52,7 @@ impl Game {
 
             let (sx, sy) = self.snake.pos();
             let (fx, fy) = self.fruit.pos();
-            if sx - fx < 10.0 && sy - fy < 10.0 {
+            if sx == fx && sy == fy {
                 self.fruit = Fruit::new();
             }
 
@@ -77,8 +77,8 @@ struct Fruit {
 impl Fruit {
     fn new() -> Fruit {
         let mut r = rand::thread_rng();
-        let x = r.gen_range(0, 640);
-        let y = r.gen_range(0, 480);
+        let x = r.gen_range(0, (WIDTH / TILE_SIZE) as i64) * TILE_SIZE as i64;
+        let y = r.gen_range(0, (HEIGHT / TILE_SIZE) as i64) * TILE_SIZE as i64;
 
         Fruit {
             x: x as f64,
@@ -100,12 +100,21 @@ impl Fruit {
     }
 }
 
+#[derive(Debug)]
+enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+    Straight,
+}
 struct Snake {
     x: f64,
     y: f64,
     size: f64,
     speed_x: f64,
     speed_y: f64,
+    dir: Direction,
     color: [f32; 4],
 }
 
@@ -117,6 +126,7 @@ impl Snake {
             size: 10.0,
             speed_x: 0.5,
             speed_y: 0.0,
+            dir: Direction::Straight,
             color: [1.0; 4],
         }
     }
@@ -141,7 +151,25 @@ impl Snake {
         self.speed_y = 0.0;
     }
 
+    fn dir(&mut self, dir: Direction) {
+        self.dir = dir
+    }
+
     fn mv(&mut self) {
+        if self.x % TILE_SIZE == 0.0 {
+            match self.dir {
+                Direction::Up => self.up(),
+                Direction::Down => self.down(),
+                _ => {}
+            }
+        }
+        if self.y % TILE_SIZE == 0.0 {
+            match self.dir {
+                Direction::Left => self.left(),
+                Direction::Right => self.right(),
+                _ => {}
+            }
+        }
         self.x += self.speed_x;
         self.y += self.speed_y;
     }
